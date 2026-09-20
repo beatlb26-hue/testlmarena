@@ -317,7 +317,7 @@ const Game = {
     const wNorm = (w - spec.wMin) / Math.max(0.001, (spec.wMax - spec.wMin));
     const price = Math.max(5, Math.round(spec.price * (0.7 + 0.8 * wNorm)));
     const xp = Math.round(spec.xp * (0.8 + 0.6 * wNorm));
-    const dist = 10 + spec.strength * 2.2 + rand(0, 5);
+    const dist = 9 + Math.pow(spec.strength, 1.3) * 2.0 + rand(0, 5);
     this.fight = {
       spec, weight: w, price, xp, dist, maxDist: dist,
       tension: 12, stam: 100, behavior: 'calm', behaviorT: 0,
