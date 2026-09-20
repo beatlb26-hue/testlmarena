@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mancing Mania 🎣 — Simulator Memancing</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="vignette"></div>
+<div id="goldenBanner" class="hidden">🌅 WAKTU EMAS! Ikan lebih mudah terpancing 🌅</div>
+
+<!-- HUD ATAS -->
+<div id="hud" class="hidden">
+  <div class="hud-left">
+    <div class="pill" id="coinPill" title="Koin">🪙 <span id="coins">0</span></div>
+    <div class="pill" id="levelPill" title="Level">🎖️ Lv <span id="level">1</span>
+      <div id="xpMini"><div id="xpMiniFill"></div></div>
+    </div>
+  </div>
+  <div class="hud-center">
+    <div class="pill" id="locPill">📍 <span id="locName">Kolam Desa</span></div>
+    <div class="pill" id="clockPill">☀️ <span id="clock">08:00</span></div>
+  </div>
+  <div class="hud-right">
+    <button class="icon-btn" id="btnSell" title="Jual Ikan">💰<span class="badge hidden" id="invBadge">0</span></button>
+    <button class="icon-btn" id="btnCollection" title="Koleksi">📖</button>
+    <button class="icon-btn" id="btnShop" title="Toko">🛒</button>
+    <button class="icon-btn" id="btnMute" title="Suara">🔊</button>
+    <button class="icon-btn" id="btnHelp" title="Bantuan">❓</button>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<!-- UI STATUS / AKSI BAWAH -->
+<div id="stateui" class="hidden">
+  <div id="hint">Tahan tombol untuk melempar kail!</div>
+  <div id="powerWrap" class="hidden">
+    <div id="powerBar"><div id="powerFill"></div><div id="powerSweet"></div></div>
+    <div class="bar-label">KEKUATAN LEMPARAN — lepas untuk melempar!</div>
+  </div>
+  <div id="fightWrap" class="hidden">
+    <div id="fightTop">
+      <div id="fishName">🐟 Ikan</div>
+      <div id="distPill">📏 <span id="dist">15.0</span> m</div>
+    </div>
+    <div class="fight-bar"><div class="bar-title">❤️ Stamina Ikan</div><div class="track"><div id="stamFill"></div></div></div>
+    <div class="fight-bar"><div class="bar-title">🧵 Ketegangan Senar</div><div class="track"><div id="tensionFill"></div><div id="dangerZone"></div></div></div>
+  </div>
+  <button id="actionBtn">🎣 TAHAN UNTUK MELEMPAR</button>
+</div>
+
+<div id="strikeFlash" class="hidden">⚡ HENTAK! ⚡</div>
+
+<!-- BACKDROP MODAL -->
+<div id="backdrop" class="hidden"></div>
+
+<!-- MODAL HASIL TANGKAPAN -->
+<div id="catchModal" class="modal hidden">
+  <div class="modal-card catch-card">
+    <div id="catchRarity">✨ IKAN LANGKA! ✨</div>
+    <h2 id="catchName">Ikan Mas</h2>
+    <canvas id="catchCanvas" width="320" height="160"></canvas>
+    <div id="catchStars">⭐⭐⭐</div>
+    <div class="catch-stats">
+      <div><span>⚖️ Berat</span><b id="catchWeight">1.2 kg</b></div>
+      <div><span>📏 Nilai</span><b id="catchPrice">🪙 100</b></div>
+      <div><span>✨ XP</span><b id="catchXP">+25</b></div>
+    </div>
+    <div id="catchRecord" class="hidden">🏆 REKOR BARU! Ikan terbesar yang pernah kamu tangkap!</div>
+    <div class="row-btns">
+      <button class="btn secondary" id="btnRelease">🌊 Lepaskan</button>
+      <button class="btn primary" id="btnKeep">🎒 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TOKO -->
+<div id="shopModal" class="modal hidden">
+  <div class="modal-card wide">
+    <div class="modal-head"><h2>🛒 Toko Pancing</h2><div class="pill">🪙 <span id="shopCoins">0</span></div><button class="x-btn" data-close="shopModal">✖</button></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="rods">🎣 Pancingan</button>
+      <button class="tab" data-tab="baits">🪱 Umpan</button>
+      <button class="tab" data-tab="locs">🗺️ Lokasi</button>
+    </div>
+    <div id="shopList" class="shop-list"></div>
+  </div>
+</div>
+
+<!-- MODAL KOLEKSI -->
+<div id="collectionModal" class="modal hidden">
+  <div class="modal-card wide">
+    <div class="modal-head"><h2>📖 Ensiklopedia Ikan</h2><div class="pill"><span id="collCount">0/13</span></div><button class="x-btn" data-close="collectionModal">✖</button></div>
+    <div id="collGrid" class="coll-grid"></div>
+  </div>
+</div>
+
+<!-- MODAL JUAL -->
+<div id="sellModal" class="modal hidden">
+  <div class="modal-card wide">
+    <div class="modal-head"><h2>💰 Jual Hasil Tangkapan</h2><button class="x-btn" data-close="sellModal">✖</button></div>
+    <div class="sell-summary"><span id="sellCount">0 ikan</span><b id="sellTotal">🪙 0</b></div>
+    <div id="sellList" class="shop-list"></div>
+    <div class="row-btns"><button class="btn primary" id="btnSellAll">💰 Jual Semua</button></div>
+  </div>
+</div>
+
+<!-- MODAL BANTUAN -->
+<div id="helpModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head"><h2>❓ Cara Bermain</h2><button class="x-btn" data-close="helpModal">✖</button></div>
+    <div class="help-body">
+      <p>🎣 <b>TAHAN</b> tombol / klik / spasi untuk mengisi kekuatan, <b>LEPAS</b> untuk melempar kail.</p>
+      <p>⏳ Tunggu pelampung disambar. Saat muncul <b>⚡ HENTAK! ⚡</b>, segera klik / tekan spasi!</p>
+      <p>🌀 Saat ikan terpancing, <b>TAHAN</b> untuk menggulung. <b>LEPAS</b> sesekali agar senar tidak <b class="red">PUTUS</b> (bar merah).</p>
+      <p>💰 Jual ikan untuk beli pancingan, umpan, dan membuka lokasi baru.</p>
+      <p>🌅 Memancing saat <b>Waktu Emas</b> (pagi & senja) memberi peluang lebih besar!</p>
+      <p>📖 Lengkapi ensiklopedia — tangkap semua 13 spesies termasuk yang legendaris!</p>
+    </div>
+    <div class="row-btns"><button class="btn danger" id="btnReset">🗑️ Hapus Data Simpanan</button></div>
+  </div>
+</div>
+
+<!-- LAYAR AWAL -->
+<div id="startOverlay">
+  <div class="start-card">
+    <div class="start-fish">🎣</div>
+    <h1>MANCING MANIA</h1>
+    <p class="subtitle">Simulator Memancing 2D — Lempar, Hentak & Gulung!</p>
+    <div class="start-feats">
+      <span>🐟 13 Spesies</span><span>🗺️ 4 Lokasi</span><span>🎣 5 Pancingan</span><span>🏆 Misi Legendaris</span>
+    </div>
+    <button id="btnStart" class="btn primary big">▶️ MULAI MEMANCING</button>
+    <p class="tiny">💡 Mainkan dengan mouse / sentuhan / spasi • Progress tersimpan otomatis</p>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
